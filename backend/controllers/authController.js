@@ -30,8 +30,8 @@ exports.registerUser = async (req, res) => {
         return res.status(200).json({ statusCode: 200, Error: false,  message: "Registered Successfully", data: user });
 
     } catch (error) {
-        console.error("Error during creation:", error);
-        return res.status(500).json(new ApiError(500, null, "An error occurred during registration"));
+        console.log(error.message);
+        return res.status(400).json({ statusCode: 400, Error: true, success: false, data: null, Message: "Error while creating user" });
     }
 };
 
@@ -70,14 +70,14 @@ exports.loginUser = async (req, res) => {
             accessToken
         });
     } catch (error) {
-        console.error("Error during login:", error);
-        return res.status(500).json(new ApiError(500, "Server Error", "Something went wrong during login"));
+        console.log(error.message);
+        return res.status(400).json({ statusCode: 400, Error: true, success: false, data: null, Message: "Error while login User" });
     }
 };
 
 exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
-
+    
     try {
         const user = await User.findOne({ email });
         if (!user) {
