@@ -13,7 +13,7 @@ const validateRequest = (schema) => {
 const registerSchema = Joi.object({
     username: Joi.string().required(),
     email: Joi.string().required(),
-    password: Joi.string().required().min(6),
+    password: Joi.string().required().min(3),
     role: Joi.allow('', null)
 });
 
@@ -22,12 +22,6 @@ const loginSchema = Joi.object({
     password: Joi.string().required(),
 });
 
-const createblog = Joi.object({
-    titel: Joi.string().required(),
-    description: Joi.string().required(),
-    author: Joi.string().required(),
-    state: Joi.required()
-})
 module.exports = {
     validateRequest,
     registerSchema,
