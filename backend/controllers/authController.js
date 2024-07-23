@@ -134,9 +134,10 @@ exports.verifyOtp = async (req, res) => {
     }
 };
 
+
 exports.resetPassword = async (req, res) => {
     const { password, otp } = req.body;
-
+   
     try {
         const user = await User.findOne({ otp, otpExpire: { $gt: Date.now() } });
 
