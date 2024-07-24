@@ -32,7 +32,7 @@ exports.getAllReservation = async (req, res) => {
             .limit(limit)
             // .populate('UserId')
             // .populate('tableId')
-            // .populate('RestaurantId')
+            // .populate('RestaurantId')         
             // .exec();
 
         const totalReservations = await Reservation.countDocuments();

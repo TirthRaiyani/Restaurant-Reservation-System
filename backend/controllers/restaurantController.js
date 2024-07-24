@@ -1,12 +1,13 @@
 const Restaurant = require('../models/restaurant.Model')
 const cloudinary = require('cloudinary').v2
 const path=require('path');
+const env = require('../config/env')
 
 
 cloudinary.config({
-    cloud_name: 'dgi44zh8u',
-    api_key: '921194656693541',
-    api_secret: '4trNW94BLv-YoOeD2adAYd1Y9bc'
+    cloud_name: env.CLOUD_NAME,
+    api_key: env.CLOUD_API_KEY,
+    api_secret: env.CLOUD_API_SECRET
 });
 
 exports.createRestaurant = async(req,res) =>{
