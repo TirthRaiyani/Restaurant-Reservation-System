@@ -1,41 +1,108 @@
 const Restaurant = require('../models/restaurant.Model')
 const cloudinary = require('cloudinary').v2
-const path=require('path');
+const path = require('path');
 const env = require('../config/env')
+const fs = require('fs')
 
 
 cloudinary.config({
     cloud_name: env.CLOUD_NAME,
     api_key: env.CLOUD_API_KEY,
-    api_secret: env.CLOUD_API_SECRET
+    api_secret: "4trNW94BLv-YoOeD2adAYd1Y9bc"
 });
 
-exports.createRestaurant = async(req,res) =>{
-    try {
-        const { RestaurantName,Address,Contact } = req.body
-        console.log(req.file.filename)
+// exports.createRestaurant = async (req, res) => {
+//     try {
+//         const { RestaurantName, Address, Contact , image} = req.body
+//         // console.log(req.file.filename)
 
-        const filePath = path.join(__dirname+'./../uploads/' + req.file.filename)
-        console.log(filePath,"path");
-        console.log(filePath)
-        const upload = await cloudinary.uploader.upload(filePath,{
-          folder:'uploads'
-        })
-        console.log(upload)
+//         const filePath = path.join(__dirname + './../uploads/' + req.file.filename)
+//         console.log(filePath, "path");
+//         console.log(filePath)
+//         const upload = await cloudinary.uploader.upload(filePath, {
+//             folder: 'uploads'
+//         })
+//         console.log(upload)
+
+//         if (!RestaurantName || !Address || !Contact) {
+//             return res.status(400).json({
+//                 StatusCode: 400,
+//                 Success: false,
+//                 Error: true,
+//                 Message: 'All fields are required',
+//             });
+//         }
+//         const restaurant = new Restaurant({
+//             RestaurantName,
+//             Address,
+//             Contact,
+//             image: upload.secure_url
+//         })
+//         const savedRestaurant = await restaurant.save()
+//         console.log(savedRestaurant)
+//         res.status(200).json({ StatusCode: 200, Success: true, Error: false, data: restaurant, Message: 'Restaurant created successfully' })
+
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while Creating Restaurant" });
+//     }
+// }
+
+exports.createRestaurant = async (req, res) => {
+    try {
+        const { RestaurantName, Address, Contact, image } = req.body;
+
+        if (!RestaurantName || !Address || !Contact || !image) {
+            return res.status(400).json({
+                StatusCode: 400,
+                Success: false,
+                Error: true,
+                Message: 'All fields are required',
+            });
+        }
+
+
+        const imageBuffer = Buffer.from(image, 'base64');
+        const tempFilePath = path.join(__dirname, './../uploads/', `temp_image_${Date.now()}.jpg`);
+
+        fs.writeFileSync(tempFilePath, imageBuffer);
+
+        const upload = await cloudinary.uploader.upload(tempFilePath, {
+            folder: 'uploads'
+        });
+
+        fs.unlinkSync(tempFilePath);
+
         const restaurant = new Restaurant({
             RestaurantName,
             Address,
             Contact,
-            image:upload.secure_url
-        })
-        await restaurant.save()
-        res.status(200).json({ StatusCode: 200, Success: true, Error:false,data : restaurant, Message :'Restaurant created successfully'})
+            image: upload.secure_url
+        });
+
+        const savedRestaurant = await restaurant.save();
+        console.log(savedRestaurant);
+
+        res.status(200).json({
+            StatusCode: 200,
+            Success: true,
+            Error: false,
+            data: restaurant,
+            Message: 'Restaurant created successfully'
+        });
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while Creating Restaurant" });
+        return res.status(500).json({
+            StatusCode: 500,
+            Success: false,
+            Error: true,
+            Message: "Something went wrong while Creating Restaurant"
+        });
     }
 }
+
+
 
 exports.updateRestaurant = async (req, res) => {
     upload.single('Image')(req, res, async (err) => {
@@ -95,44 +162,20 @@ exports.updateRestaurant = async (req, res) => {
 
 exports.getRestaurant = async (req, res) => {
     try {
-        const page = parseFloat(req.query.page) || 1;
-        const limit = parseFloat(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
-
-        const searchQuery = req.query.search || '';
-
-        const sortField = req.query.sortBy || '_id';
-        const sortOrder = req.query.order || 'asc';
-
-        const sortOptions = {};
-        sortOptions[ sortField ] = sortOrder === 'desc' ? -1 : 1;
-
-        const query = {
-            $or: [
-                { RestaurantName: { $regex: searchQuery, $options: 'i' } }
-            ]
-        };
-
-        const restaurants = await Restaurant.find(query)
-            .sort(sortOptions)
-            .skip(skip)
-            .limit(limit);
+        const restaurants = await Restaurant.find({})
 
         if (!restaurants.length) {
-            throw new ApiError(404, 'No Restaurants found');
+            throw new res.json({ statuscode: 404, Message: 'No Restaurants found' });
         }
 
-        res.status(200).json({ StatusCode: 200, data: restaurants, Message: 'Restaurants fetched successfully' });
-
+        res.status(200).json({ statuscode: 200, Success: true, Error: false, data: restaurants, Message: 'Restaurants fetched successfully' });
 
     } catch (error) {
         console.log(error.Message);
-        return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while fetching Restaurants" });
+        return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while fetching Restaurants" })
     }
 
 }
-
-
 
 exports.deleteRestaurant = async (req, res) => {
     try {
@@ -141,13 +184,28 @@ exports.deleteRestaurant = async (req, res) => {
         const deletedRestaurant = await Restaurant.findByIdAndDelete(id);
 
         if (!deletedRestaurant) {
-             return res.status(404).json({ StatusCode: 404, Error: true, Success: false, Message: "No restaurant found"})
+            return res.status(404).json({ StatusCode: 404, Error: true, Success: false, Message: "No restaurant found" })
+        }
+    res.status(200).json({ StatusCode: 200, Error: false, data: deletedRestaurant, Message: 'Restaurant deleted successfully' })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while deleting restaurant" });
+    }
+}
+
+exports.getPopularRestaurants = async (req, res) => {
+    try {
+        const restaurants = await Restaurant.find({}).limit(5)
+
+        if (!restaurants.length) {
+            throw new res.json({ statuscode: 404, Message: 'No Restaurants found' });
         }
 
-        res.status(200).json({ StatusCode: 200,  Error: false, data: deletedRestaurant, Message: 'Restaurant deleted successfully' })
-    }catch(error){
-        console.log(error);
-        return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while deleting restaurant"});
+        res.status(200).json({ statuscode: 200, data: restaurants, Message: 'Restaurants fetched successfully' });
+
+    } catch (error) {
+        console.log(error.Message);
+        return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while fetching Restaurants" })
     }
 }
 

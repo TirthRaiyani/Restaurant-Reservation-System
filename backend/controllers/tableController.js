@@ -2,13 +2,12 @@ const Table = require('../models/table.Model')
 
 exports.creatTable = async(req,res) =>{
     try {
-        const { tableNumber, restaurantId, capacity, location } = req.body
+        const { tableNumber, restaurantId, capacity } = req.body
 
         const table = new Table({
             tableNumber,
             restaurantId,
-            capacity,
-            location
+            capacity
         })
         await table.save()
         res.status(200).json({ StatusCode: 200, Error: false, data: table, Message: 'Table created successfully' })
@@ -62,11 +61,11 @@ exports.getTable = async (req, res) => {
 exports.updateTable = async (req, res) => {
     try {
         const { id } = req.params;
-        const { capacity, location } = req.body;
+        const { capacity } = req.body;
 
         const updatedTable = await Table.findByIdAndUpdate(
             id,
-            { capacity, location},
+            { capacity},
             { new: true, runValidators: true }
         );
 

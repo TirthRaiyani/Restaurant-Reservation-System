@@ -56,43 +56,58 @@ exports.getAllUserCount = async(req,res) =>{
     }
 }
 
-exports.getAllUser = async(req,res) =>{
-try {
-            const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 10;
-            const skip = (page - 1) * limit;
+// exports.getAllUser = async(req,res) =>{
+// try {
+//             const page = parseInt(req.query.page) || 1;
+//             const limit = parseInt(req.query.limit) || 10;
+//             const skip = (page - 1) * limit;
     
-            const searchQuery = req.query.search || '';
+//             const searchQuery = req.query.search || '';
     
-            const sortField = req.query.sortBy || '_id';
-            const sortOrder = req.query.order || 'asc';
+//             const sortField = req.query.sortBy || '_id';
+//             const sortOrder = req.query.order || 'asc';
     
-            const sortOptions = {};
-            sortOptions[ sortField ] = sortOrder === 'desc' ? -1 : 1;
+//             const sortOptions = {};
+//             sortOptions[ sortField ] = sortOrder === 'desc' ? -1 : 1;
     
-            const query = {
-                $or: [
-                    { username: { $regex: searchQuery, $options: 'i' } }
-                ]
-            };
+//             const query = {
+//                 $or: [
+//                     { username: { $regex: searchQuery, $options: 'i' } }
+//                 ]
+//             };
     
-            const users = await User.find(query)
-                .select('-password -refreshToken')
-                .sort(sortOptions)
-                .skip(skip)
-                .limit(limit);
+//             const users = await User.find(query)
+//                 .select('-password -refreshToken')
+//                 .sort(sortOptions)
+//                 .skip(skip)
+//                 .limit(limit);
     
-            if (!users.length) {
-                throw new ApiError(404, 'No users found');
-            }
+//             if (!users.length) {
+//                 throw new ApiError(404, 'No users found');
+//             }
     
-    res.status(200).json({ statusCode: 200, data: users, Message: 'Total user retrieved' });;
-        }
-        catch (error) {
-    console.log(error.message);
-    return res.status(500).json({ statusCode: 500, error: true, message: "Failed to retrive User" })
-}}
+//     res.status(200).json({ statusCode: 200, data: users, Message: 'Total user retrieved' });;
+//         }
+//         catch (error) {
+//     console.log(error.message);
+//     return res.status(500).json({ statusCode: 500, error: true, message: "Failed to retrive User" })
+// }}
 
+exports.getAllUser = async (req, res) => {
+    try {
+        const users = await User.find({})
+
+        if (!users.length) {
+            throw new res.json({ statuscode: 404, Success: false, Error: true, Message: 'No Users found' });
+        }
+
+        res.status(200).json({ statuscode: 200, Success: true, Error: false,data: users, Message: 'Users fetched successfully' });
+
+    } catch (error) {
+        console.log(error.Message);
+        return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while fetching Users" })
+    }
+}
 exports.deleteUser = async (req, res) => {
 
     try {

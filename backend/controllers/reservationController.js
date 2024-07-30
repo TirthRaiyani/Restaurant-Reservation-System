@@ -23,20 +23,23 @@ exports.makeReservation = async (req, res) => {
 
 exports.getAllReservation = async (req, res) => {
     try {
-        const { page = 1, limit = 10 } = req.query;
-
-        const skip = (page - 1) * limit;
-
         const reservations = await Reservation.find()
-            .skip(skip)
-            .limit(limit)
-            // .populate('UserId')
-            // .populate('tableId')
-            // .populate('RestaurantId')         
-            // .exec();
-
+            .populate('UserId')
+            .populate('tableId')
+            .populate('RestaurantId')         
+  
+        const mappedReservation={
+            data:reservations.map(object=>({
+                    _id:object._id,
+                username: object.UserId.username,
+                restaurantName: object.RestaurantId.RestaurantName,
+                NumberOfPeople: object.NumberOfPeople,
+                Address : object.RestaurantId.Address,
+                Time: object.time
+            }))
+        }
         const totalReservations = await Reservation.countDocuments();
-        res.status(200).json({ StatusCode: 200, data: reservations, totalReservations, Message: 'Reservations fetched successfully' });
+        res.status(200).json({ StatusCode: 200, Success: true, Error: false, data: mappedReservation, TotalReservaation : totalReservations, Message: 'Reservations fetched successfully' });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while Fetching Reservation" });
