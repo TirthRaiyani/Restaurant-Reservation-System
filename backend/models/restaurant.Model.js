@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const { mongoose, Schema } = require('mongoose');
 
 const restaurantSchema = new mongoose.Schema({
     RestaurantName: {
@@ -16,7 +16,11 @@ const restaurantSchema = new mongoose.Schema({
     image: {
         type: String,
         required: false 
-    }
+    },
+    tableId:[{
+        type: Schema.Types.ObjectId,
+        ref:'Table',
+    }]
 });
 
 const Restaurant = mongoose.model("Restaurant", restaurantSchema);

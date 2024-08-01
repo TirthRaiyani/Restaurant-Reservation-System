@@ -4,9 +4,8 @@ const {mongoose,Schema} = require('mongoose');
 
 const tableSchema = new mongoose.Schema({
     tableNumber: {
-        type: Number,
-        required: true,
-        unique: true, 
+        type: String,
+        required: true, 
     },
     restaurantId: {
         type: Schema.Types.ObjectId,
@@ -14,11 +13,23 @@ const tableSchema = new mongoose.Schema({
         required: true,
     },
     capacity: {
-        type: Number,
+        type: String,
         required: true,
     },
    
 }, { timestamps: true }); 
+
+tableSchema.pre('remove', async function (next) {
+    try {
+        await Restaurant.updateOne(
+            { _id: this.restaurantId },
+            { $pull: { tableId: this._id } }
+        );
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 
 const Table = mongoose.model('Table', tableSchema);
 

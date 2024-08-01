@@ -11,47 +11,11 @@ cloudinary.config({
     api_secret: "4trNW94BLv-YoOeD2adAYd1Y9bc"
 });
 
-// exports.createRestaurant = async (req, res) => {
-//     try {
-//         const { RestaurantName, Address, Contact , image} = req.body
-//         // console.log(req.file.filename)
-
-//         const filePath = path.join(__dirname + './../uploads/' + req.file.filename)
-//         console.log(filePath, "path");
-//         console.log(filePath)
-//         const upload = await cloudinary.uploader.upload(filePath, {
-//             folder: 'uploads'
-//         })
-//         console.log(upload)
-
-//         if (!RestaurantName || !Address || !Contact) {
-//             return res.status(400).json({
-//                 StatusCode: 400,
-//                 Success: false,
-//                 Error: true,
-//                 Message: 'All fields are required',
-//             });
-//         }
-//         const restaurant = new Restaurant({
-//             RestaurantName,
-//             Address,
-//             Contact,
-//             image: upload.secure_url
-//         })
-//         const savedRestaurant = await restaurant.save()
-//         console.log(savedRestaurant)
-//         res.status(200).json({ StatusCode: 200, Success: true, Error: false, data: restaurant, Message: 'Restaurant created successfully' })
-
-//     } catch (error) {
-//         console.log(error);
-//         return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while Creating Restaurant" });
-//     }
-// }
 
 exports.createRestaurant = async (req, res) => {
     try {
         const { RestaurantName, Address, Contact, image } = req.body;
-
+        // console.log(req.body)
         if (!RestaurantName || !Address || !Contact || !image) {
             return res.status(400).json({
                 StatusCode: 400,
@@ -162,20 +126,60 @@ exports.updateRestaurant = async (req, res) => {
 
 exports.getRestaurant = async (req, res) => {
     try {
-        const restaurants = await Restaurant.find({})
+        const restaurants = await Restaurant.aggregate([
+            {
+                $lookup: {
+                    from: 'tables', 
+                    localField: 'tableId',
+                    foreignField: '_id', 
+                    as: 'tables' 
+                }
+            },
+            {
+                $addFields: {
+                    tableCount: { $size: '$tables' } 
+                }
+            },
+            {
+                $project: { 
+                    RestaurantName: 1,
+                    Address: 1,
+                    Contact: 1,
+                    image: 1,
+                    // tableId: 1,
+                    tables: 1, 
+                    tableCount: 1 
+                }
+            },
+            {
+                $unset: 'tableId' 
+            }
+        ]);
 
         if (!restaurants.length) {
-            throw new res.json({ statuscode: 404, Message: 'No Restaurants found' });
+            return res.status(404).json({ statuscode: 404, Message: 'No Restaurants found' });
         }
 
-        res.status(200).json({ statuscode: 200, Success: true, Error: false, data: restaurants, Message: 'Restaurants fetched successfully' });
+        res.status(200).json({
+            statuscode: 200,
+            Success: true,
+            Error: false,
+            data: restaurants,
+            Message: 'Restaurants fetched successfully'
+        });
 
     } catch (error) {
-        console.log(error.Message);
-        return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while fetching Restaurants" })
+        console.log(error.message);
+        return res.status(500).json({
+            StatusCode: 500,
+            Success: false,
+            Error: true,
+            Message: "Something went wrong while fetching Restaurants"
+        });
     }
+};
 
-}
+
 
 exports.deleteRestaurant = async (req, res) => {
     try {

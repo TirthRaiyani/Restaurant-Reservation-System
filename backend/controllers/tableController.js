@@ -1,16 +1,33 @@
 const Table = require('../models/table.Model')
-
+const Restaurant = require('../models/restaurant.Model')
 exports.creatTable = async(req,res) =>{
     try {
         const { tableNumber, restaurantId, capacity } = req.body
+
+        if (!tableNumber || !restaurantId || !capacity) {
+            return res.status(400).json({ StatusCode: 400, Error: true, Message: 'All fields are required' });
+        }
 
         const table = new Table({
             tableNumber,
             restaurantId,
             capacity
         })
-        await table.save()
-        res.status(200).json({ StatusCode: 200, Error: false, data: table, Message: 'Table created successfully' })
+       
+        const savedTable = await table.save()
+
+        console.log(savedTable)
+        const updatedRestaurant = await Restaurant.findByIdAndUpdate(
+            restaurantId,
+            {
+                $push: {
+                    tableId: savedTable._id 
+                }
+            },
+            { new: true, useFindAndModify: false }
+        );
+        console.log(updatedRestaurant,  "updatedRestaurant")
+        res.status(200).json({ StatusCode: 200, Error: false, data: { table, updatedRestaurant }, Message: 'Table created successfully' })
 
     } catch (error) {
         console.log(error);
@@ -20,39 +37,17 @@ exports.creatTable = async(req,res) =>{
 
 exports.getTable = async (req, res) => {
     try {
-        const page = parseFloat(req.query.page) || 1;
-        const limit = parseFloat(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
+        const tables = await Table.find({}).populate('RestaurantId')
 
-        const searchQuery = req.query.search || '';
-
-        const sortField = req.query.sortBy || '_id';
-        const sortOrder = req.query.order || 'asc';
-
-        const sortOptions = {};
-        sortOptions[ sortField ] = sortOrder === 'desc' ? -1 : 1;
-
-        const query = {
-            $or: [
-                { location: { $regex: searchQuery, $options: 'i' } }
-            ]
-        };
-
-        const table = await Table.find(query)
-            .sort(sortOptions)
-            .skip(skip)
-            .limit(limit);
-
-        if (!table.length) {
-            throw new ApiError(404, 'No table found');
+        if (!tables.length) {
+            throw new res.json({ statuscode: 404, Message: 'No Table found' });
         }
 
-        res.status(200).json({ StatusCode: 200, data: table, Message: 'Tables fetched successfully' });
-
+        res.status(200).json({ statuscode: 200, Success: true, Error: false, data: tables, Message: 'Tables fetched successfully' });
 
     } catch (error) {
         console.log(error.Message);
-        return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while fetching Tables" });
+        return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while fetching Tables" })
     }
 
 }
@@ -70,29 +65,13 @@ exports.updateTable = async (req, res) => {
         );
 
         if (!updatedTable) {
-            return res.status(404).json({
-                StatusCode: 404,
-                Error: true,
-                Success: false,
-                Message: "No table found"
-            });
-        }
+            return res.status(404).json({ StatusCode: 404, Error: true, Success: false, Message: "No table found" })}
 
-        res.status(200).json({
-            StatusCode: 200,
-            Error: false,
-            data: updatedTable,
-            Message: 'Table updated successfully'
-        });
+        res.status(200).json({StatusCode: 200,Error: false,data: updatedTable,Message: 'Table updated successfully'});
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({
-            StatusCode: 500,
-            Success: false,
-            Error: true,
-            Message: "Something went wrong while updating Table"
-        });
+        return res.status(500).json({ StatusCode: 500, Success: false,Error: true, Message: "Something went wrong while updating Table" });
     }
 }
 
