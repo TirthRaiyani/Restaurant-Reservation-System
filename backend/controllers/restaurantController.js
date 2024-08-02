@@ -14,7 +14,7 @@ cloudinary.config({
 
 exports.createRestaurant = async (req, res) => {
     try {
-        const { RestaurantName, Address, Contact, image } = req.body;
+        const { RestaurantName, Address, Contact, image, City, Area } = req.body;
         // console.log(req.body)
         if (!RestaurantName || !Address || !Contact || !image) {
             return res.status(400).json({
@@ -41,7 +41,9 @@ exports.createRestaurant = async (req, res) => {
             RestaurantName,
             Address,
             Contact,
-            image: upload.secure_url
+            image: upload.secure_url,
+            City,
+            Area
         });
 
         const savedRestaurant = await restaurant.save();
@@ -75,7 +77,7 @@ exports.updateRestaurant = async (req, res) => {
         }
         try {
             const { id } = req.params;
-            const { RestaurantName, Address, Contact } = req.body;
+            const { RestaurantName, Address, Contact, City, Area } = req.body;
 
             let imageUrl;
             if (req.file) {
@@ -84,7 +86,7 @@ exports.updateRestaurant = async (req, res) => {
                 imageUrl = uploadResponse.secure_url;
             }
 
-            const updatedFields = { RestaurantName, Address, Contact };
+            const updatedFields = { RestaurantName, Address, Contact ,City, Area};
             if (imageUrl) {
                 updatedFields.image = imageUrl;
             }
@@ -146,6 +148,8 @@ exports.getRestaurant = async (req, res) => {
                     Address: 1,
                     Contact: 1,
                     image: 1,
+                    city:1,
+                    Area:1,
                     // tableId: 1,
                     tables: 1, 
                     tableCount: 1 

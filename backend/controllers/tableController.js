@@ -24,11 +24,10 @@ exports.creatTable = async(req,res) =>{
                     tableId: savedTable._id 
                 }
             },
-            { new: true, useFindAndModify: false }
+            {new: true, useFindAndModify: false}
         );
         console.log(updatedRestaurant,  "updatedRestaurant")
         res.status(200).json({ StatusCode: 200, Error: false, data: { table, updatedRestaurant }, Message: 'Table created successfully' })
-
     } catch (error) {
         console.log(error);
         return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while Creating Table" });
@@ -51,7 +50,7 @@ exports.getTable = async (req, res) => {
     }
 
 }
-
+  
 
 exports.updateTable = async (req, res) => {
     try {

@@ -13,6 +13,14 @@ const restaurantSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    City:{
+        type: String,
+        required: true
+    },
+    Area:{
+        type: String,
+        required: true
+    },
     image: {
         type: String,
         required: false 
