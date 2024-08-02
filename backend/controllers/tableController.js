@@ -36,7 +36,7 @@ exports.creatTable = async(req,res) =>{
 
 exports.getTable = async (req, res) => {
     try {
-        const tables = await Table.find({}).populate('RestaurantId')
+        const tables = await Table.find({}).populate('restaurantId').exec()
 
         if (!tables.length) {
             throw new res.json({ statuscode: 404, Message: 'No Table found' });

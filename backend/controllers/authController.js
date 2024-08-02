@@ -1,6 +1,5 @@
 const User = require('../models/user.Model')
 const jwt = require('jsonwebtoken')
-const ApiError = require('../utils/apiError')
 const env = require('../config/env')
 const transporter = require('../config/mailer')
 const { sendWelcomeEmail } = require('../utils/nodemailer')
@@ -31,7 +30,7 @@ exports.registerUser = async (req, res) => {
 
     } catch (error) {
         console.log(error.message);
-        return res.status(400).json({ statusCode: 400, Error: true, success: false, data: null, Message: "Error while creating user" });
+        return res.status(500).json({ statusCode: 500, Error: true, success: false, data: null, Message: "Error while creating user" });
     }
 };
 
@@ -71,7 +70,7 @@ exports.loginUser = async (req, res) => {
         });
     } catch (error) {
         console.log(error.message);
-        return res.status(400).json({ statusCode: 400, Error: true, success: false, data: null, Message: "Error while login User" });
+        return res.status(500).json({ statusCode: 500, Error: true, success: false, data: null, Message: "Error while login User" });
     }
 };
 
@@ -113,7 +112,7 @@ exports.forgotPassword = async (req, res) => {
         });
     } catch (error) {
         console.log(error.message);
-        return res.status(400).json({ statusCode: 400, Error: true, success: false, data: null, Message: "Server Error" });
+        return res.status(500).json({ statusCode: 500, Error: true, success: false, data: null, Message: "Server Error" });
     }
 };
 

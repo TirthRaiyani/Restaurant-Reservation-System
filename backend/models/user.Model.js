@@ -42,6 +42,10 @@ const userSchema = new mongoose.Schema({
     City:{
         type:String,
         default:null
+    },
+    Area: {
+        type:String,
+        default:null
     }
 }, {
     timestamps: true,

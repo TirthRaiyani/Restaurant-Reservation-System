@@ -16,7 +16,7 @@ exports.createRestaurant = async (req, res) => {
     try {
         const { RestaurantName, Address, Contact, image, City, Area } = req.body;
         // console.log(req.body)
-        if (!RestaurantName || !Address || !Contact || !image) {
+        if (!RestaurantName || !Address || !Contact || !image || !City || !Area) {
             return res.status(400).json({
                 StatusCode: 400,
                 Success: false,
@@ -209,7 +209,7 @@ exports.getPopularRestaurants = async (req, res) => {
             throw new res.json({ statuscode: 404, Message: 'No Restaurants found' });
         }
 
-        res.status(200).json({ statuscode: 200, data: restaurants, Message: 'Restaurants fetched successfully' });
+        res.status(200).json({ statuscode: 200, Success: true, Error: false, data: restaurants, Message: 'Restaurants fetched successfully' });
 
     } catch (error) {
         console.log(error.Message);

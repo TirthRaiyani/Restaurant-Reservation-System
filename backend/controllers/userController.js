@@ -2,7 +2,7 @@ const User = require('../models/user.Model')
 // const env = require('../config/env')
 
 exports.editProfile = async (req, res) => {
-    const { username, email, Gender, DOB, City } = req.body;
+    const { username, email, Gender, DOB, City, Area } = req.body;
 
     try {
         const userId = req.user._id; 
@@ -12,6 +12,7 @@ exports.editProfile = async (req, res) => {
             email,
             Gender,
             City,
+            Area
         };
 
         if (DOB) {

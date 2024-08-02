@@ -23,21 +23,24 @@ exports.makeReservation = async (req, res) => {
 
 exports.getAllReservation = async (req, res) => {
     try {
-        const reservations = await Reservation.find()
+        const reservations = await Reservation.find({})
             .populate('UserId')
             .populate('tableId')
             .populate('RestaurantId')         
-  
-        const mappedReservation={
-            data:reservations.map(object=>({
-                    _id:object._id,
+
+        const mappedReservation = {
+            data: reservations.map(object => ({
+                _id: object._id,
                 username: object.UserId.username,
-                restaurantName: object.RestaurantId.RestaurantName,
+                restaurantName: object.RestaurantId ? object.RestaurantId.RestaurantName : null,
                 NumberOfPeople: object.NumberOfPeople,
-                Address : object.RestaurantId.Address,
+                Address: object.RestaurantId ? object.RestaurantId.Address : null,
+                Area : object.RestaurantId ? object.RestaurantId.Area : null,
+                City : object.RestaurantId ? object.RestaurantId.City : null,
                 Time: object.time
             }))
         }
+
         const totalReservations = await Reservation.countDocuments();
         res.status(200).json({ StatusCode: 200, Success: true, Error: false, data: mappedReservation, TotalReservaation : totalReservations, Message: 'Reservations fetched successfully' });
     } catch (error) {
