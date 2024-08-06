@@ -3,27 +3,55 @@ const jwt = require('jsonwebtoken')
 const env = require('../config/env')
 const transporter = require('../config/mailer')
 const { sendWelcomeEmail } = require('../utils/nodemailer')
+const fs = require('fs')
+const cloudinary = require('cloudinary').v2
+const path = require('path');
+
+
+cloudinary.config({
+    cloud_name: env.CLOUD_NAME,
+    api_key: env.CLOUD_API_KEY,
+    api_secret: "4trNW94BLv-YoOeD2adAYd1Y9bc"
+});
 
 exports.registerUser = async (req, res) => {
     try {
         
-        const { username, email, password, role } = req.body;
+        const { username, email, password, role, image } = req.body;
+        console.log(req.body)
 
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
             return res.status(409).json({ statusCode: 409, message: "User Already Exists", data: existingUser });
         }
+        if (!image) {
+            return res.status(400).json({ statusCode: 400, message: "Please provide an image for the user." });
+        }
+
+        const imageBuffer = Buffer.from(image, 'base64');
+        const tempFilePath = path.join(__dirname, './../uploads/', `temp_image_${Date.now()}.jpg`);
+        console.log(tempFilePath, "sdfghgfg")
+
+        fs.writeFileSync(tempFilePath, imageBuffer);
+
+        const upload = await cloudinary.uploader.upload(tempFilePath, {
+            folder: 'uploads'
+        });
+
+        fs.unlinkSync(tempFilePath);
 
         const user = new User({
             username,
             email,
             password,
             role,
+            image: upload.secure_url,
             status: true
         });
 
-        await user.save();
+        const savedUser = await user.save();
+        console.log(savedUser)
         await sendWelcomeEmail(user.email);
 
         return res.status(200).json({ statusCode: 200, Error: false,  message: "Registered Successfully", data: user });

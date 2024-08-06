@@ -4,7 +4,7 @@ const restaurantController = require('../controllers/restaurantController')
 const upload = require('../utils/uploads')
 const {verifyJWT} = require('../middlewares/authMiddleware')
 
-router.post('/createRestaurant',upload.single("image"),restaurantController.createRestaurant)
+router.post('/createRestaurant',restaurantController.createRestaurant)
 router.get('/getAllRestaurant', restaurantController.getRestaurant)
 router.put('/updateRestaurant/:id', restaurantController.updateRestaurant)
 router.delete('/deleteRestaurant/:id', restaurantController.deleteRestaurant)

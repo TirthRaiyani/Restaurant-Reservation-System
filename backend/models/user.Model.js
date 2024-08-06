@@ -22,31 +22,35 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: [ 'admin', 'user' ],
-        default: 'user',
+        default: 'admin',
     },
     otp: {
         type: Number,
     },
     otpExpire: {
-        type: Date
+        type: Date,
     },
-    Gender:{
-        type:String,
-        enum:["Male","Female","Other"],
-        default:null
+    Gender: {
+        type: String,
+        enum: [ "Male", "Female", "Other" ],
+        default: null,
     },
-    DOB:{
-        type:String,
-        default:null
+    DOB: {
+        type: Date,
+        default: null,
     },
-    City:{
-        type:String,
-        default:null
+    City: {
+        type: String,
+        default: null,
     },
     Area: {
-        type:String,
-        default:null
-    }
+        type: String,
+        default: null,
+    },
+    image: {
+        type: String,
+        required:true
+    },
 }, {
     timestamps: true,
 });
