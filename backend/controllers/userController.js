@@ -73,7 +73,7 @@ exports.getAllUserCount = async(req,res) =>{
 
 exports.getAllUser = async (req, res) => {
     try {
-        const users = await User.find({ role: { $ne: 'admin' } }).select('-password -timestamp');
+        const users = await User.find({ role: { $nin: [ 'admin', 'superadmin' ] } }).select('-password -timestamp');
 
         if (!users.length) {
             return res.status(404).json({ statusCode: 404, Success: false, Error: true, Message: 'No Users found' });

@@ -86,7 +86,7 @@ exports.updateRestaurant = async (req, res) => {
                 imageUrl = uploadResponse.secure_url;
             }
 
-            const updatedFields = { RestaurantName, Address, Contact ,City, Area};
+            const updatedFields = { RestaurantName, Address, Contact, City, Area };
             if (imageUrl) {
                 updatedFields.image = imageUrl;
             }
@@ -131,32 +131,32 @@ exports.getRestaurant = async (req, res) => {
         const restaurants = await Restaurant.aggregate([
             {
                 $lookup: {
-                    from: 'tables', 
+                    from: 'tables',
                     localField: 'tableId',
-                    foreignField: '_id', 
-                    as: 'tables' 
+                    foreignField: '_id',
+                    as: 'tables'
                 }
             },
             {
                 $addFields: {
-                    tableCount: { $size: '$tables' } 
+                    tableCount: { $size: '$tables' }
                 }
             },
             {
-                $project: { 
+                $project: {
                     RestaurantName: 1,
                     Address: 1,
                     Contact: 1,
                     image: 1,
-                    city:1,
-                    Area:1,
+                    city: 1,
+                    Area: 1,
                     // tableId: 1,
-                    tables: 1, 
-                    tableCount: 1 
+                    tables: 1,
+                    tableCount: 1
                 }
             },
             {
-                $unset: 'tableId' 
+                $unset: 'tableId'
             }
         ]);
 
@@ -194,7 +194,7 @@ exports.deleteRestaurant = async (req, res) => {
         if (!deletedRestaurant) {
             return res.status(404).json({ StatusCode: 404, Error: true, Success: false, Message: "No restaurant found" })
         }
-    res.status(200).json({ StatusCode: 200, Error: false, data: deletedRestaurant, Message: 'Restaurant deleted successfully' })
+        res.status(200).json({ StatusCode: 200, Error: false, data: deletedRestaurant, Message: 'Restaurant deleted successfully' })
     } catch (error) {
         console.log(error);
         return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while deleting restaurant" });

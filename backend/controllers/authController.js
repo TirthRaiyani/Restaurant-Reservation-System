@@ -18,7 +18,7 @@ exports.registerUser = async (req, res) => {
     try {
         
         const { username, email, password, role, image } = req.body;
-        console.log(req.body)
+        // console.log(req.body)
 
         const existingUser = await User.findOne({ email });
 
