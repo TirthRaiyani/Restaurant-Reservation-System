@@ -44,7 +44,7 @@ exports.getAllReservation = async (req, res) => {
         const totalReservations = await Reservation.countDocuments();
         res.status(200).json({ StatusCode: 200, Success: true, Error: false, data: mappedReservation, TotalReservaation : totalReservations, Message: 'Reservations fetched successfully' });
     } catch (error) {
-        console.error(error);
+        console.log(error, "errrrrrrrrrrorrrrrr");
         return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while Fetching Reservation" });
     }
 }

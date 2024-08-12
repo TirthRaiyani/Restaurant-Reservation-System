@@ -27,14 +27,14 @@ const userSchema = new mongoose.Schema({
     otp: {
         type: Number,
     },
-    otpExpire: {
+    otpExpire: { 
         type: Date,
     },
     Gender: {
         type: String,
         enum: [ "Male", "Female", "Other" ],
         default: null,
-    },
+    },                                                                                                                                                                                                                                                                                                                                                              
     DOB: {
         type: Date,
         default: null,

@@ -3,7 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/authController')
 const { loginSchema, registerSchema, validateRequest } = require('../middlewares/validateMiddleware')
 const upload = require('../utils/uploads')
-
+const verifyJWT = require('../middlewares/authMiddleware')
 
 router.post('/register', validateRequest(registerSchema),  authController.registerUser);
 router.post('/login', validateRequest(loginSchema), authController.loginUser);
