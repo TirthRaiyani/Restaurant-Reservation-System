@@ -81,6 +81,7 @@ exports.loginUser = async (req, res) => {
 
         const payload = {
             _id: user._id,
+            role:user.role
         };
 
         const accessToken = jwt.sign(payload, env.SECRET_KEY, {

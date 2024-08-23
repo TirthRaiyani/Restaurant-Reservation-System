@@ -28,7 +28,12 @@ const restaurantSchema = new mongoose.Schema({
     tableId:[{
         type: Schema.Types.ObjectId,
         ref:'Table',
-    }]
+    }],
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
 });
 
 const Restaurant = mongoose.model("Restaurant", restaurantSchema);
