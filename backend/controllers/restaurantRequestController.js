@@ -200,13 +200,7 @@ exports.handleRestaurantRequest = async (req, res) => {
 
 exports.getMyRestaurants = async (req, res) => {
     try {
-        // const adminId = req.user._id;
-
-        // const restaurants = await Restaurant.find({ createdBy: adminId }).select('-createdBy');
-        // // console.log(restaurants)
-        // const restaurant = await Restaurant.findOne({ _id: restaurants }); 
-        // const tableCount = restaurant.tableId.length; 
-
+        
         const adminId = req.user._id;
 
         const restaurants = await Restaurant.find({ createdBy: adminId }).select('-createdBy');
