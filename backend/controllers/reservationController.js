@@ -1,4 +1,6 @@
 const Reservation = require('../models/reservation.Model')
+const Restaurant = require('../models/restaurant.Model')
+
 
 exports.makeReservation = async (req, res) => {
     try {
@@ -48,3 +50,60 @@ exports.getAllReservation = async (req, res) => {
         return res.status(500).json({ StatusCode: 500, Success: false, Error: true, Message: "Something went wrong while Fetching Reservation" });
     }
 }
+
+exports.getMyReservationForUser = async (req, res) => {
+    try {
+        const userId = req.user._id; 
+
+        const reservations = await Reservation.find({ userId }); 
+
+        if (!reservations || reservations.length === 0) {
+            return res.status(404).json({ StatusCode: 404, Error: true, Message: 'No reservations found for this user' });
+        }
+
+        const restaurantIds = reservations.map(reservation => reservation.RestaurantId);
+
+        // console.log(restaurantIds, "restaurantIds");
+
+        res.status(200).json({
+            StatusCode: 200,
+            Error: false,
+            data: reservations,
+            Message: 'Reservation fetched successfully'
+        });
+    } catch (error) {
+        console.log(error.message, "getMyReservation failed");
+        res.status(500).json({ statusCode: 500, error: true, success: false, message: "Something went wrong while fetching reservations" });
+    }
+};
+
+
+exports.getMyReservation = async (req, res) => {
+    try {
+        const adminId = req.user._id; 
+
+        const adminRestaurants = await Restaurant.find({ createdBy: adminId });
+
+        if (!adminRestaurants || adminRestaurants.length === 0) {
+            return res.status(404).json({ StatusCode: 404, Error: true, Message: 'No restaurants found for this admin' });
+        }
+
+        const restaurantIds = adminRestaurants.map(restaurant => restaurant._id);
+
+        const reservations = await Reservation.find({ RestaurantId: { $in: restaurantIds } });
+
+        if (!reservations || reservations.length === 0) {
+            return res.status(404).json({ StatusCode: 404, Error: true, Message: 'No reservations found for these restaurants' });
+        }
+
+        res.status(200).json({
+            StatusCode: 200,
+            Error: false,
+            data: reservations,
+            Message: 'Reservations fetched successfully'
+        });
+    } catch (error) {
+        console.log(error.message, "getMyReservation failed");
+        res.status(500).json({ statusCode: 500, error: true, success: false, message: "Something went wrong while fetching reservations" });
+    }
+};
