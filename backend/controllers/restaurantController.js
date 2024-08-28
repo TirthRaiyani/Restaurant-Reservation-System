@@ -150,7 +150,7 @@ exports.getRestaurant = async (req, res) => {
                     image: 1,
                     city: 1,
                     Area: 1,
-                    // tableId: 1,
+                    tableId: 1,
                     tables: 1,
                     tableCount: 1
                 }
@@ -159,6 +159,14 @@ exports.getRestaurant = async (req, res) => {
                 $unset: 'tableId'
             }
         ]);
+
+        const tableCount = await Restaurant.aggregate([
+            { $unwind: "$tableId" }, 
+            { $group: { _id: null, totalTables: { $sum: 1 } } }
+        ]);
+
+        const totalTables = tableCount[ 0 ]?.totalTables || 0;
+
 
         if (!restaurants.length) {
             return res.status(404).json({ statuscode: 404, Message: 'No Restaurants found' });
@@ -169,6 +177,7 @@ exports.getRestaurant = async (req, res) => {
             Success: true,
             Error: false,
             data: restaurants,
+            TableCount: totalTables,
             Message: 'Restaurants fetched successfully'
         });
 

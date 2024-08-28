@@ -200,16 +200,30 @@ exports.handleRestaurantRequest = async (req, res) => {
 
 exports.getMyRestaurants = async (req, res) => {
     try {
+        // const adminId = req.user._id;
+
+        // const restaurants = await Restaurant.find({ createdBy: adminId }).select('-createdBy');
+        // // console.log(restaurants)
+        // const restaurant = await Restaurant.findOne({ _id: restaurants }); 
+        // const tableCount = restaurant.tableId.length; 
+
         const adminId = req.user._id;
 
         const restaurants = await Restaurant.find({ createdBy: adminId }).select('-createdBy');
-        console.log(restaurants)
+        const restaurantsWithTableCount = restaurants.map(restaurant => {
+            const tableCount = restaurant.tableId.length; 
+            return {
+                ...restaurant.toObject(), 
+                tableCount
+            };
+        });
+
 
         res.status(200).json({
             StatusCode: 200,
             Success: true,
             Error: false,
-            data: restaurants,
+            data: restaurantsWithTableCount,
             Message: 'Restaurants fetched successfully',
         });
 
